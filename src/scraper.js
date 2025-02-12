@@ -37,7 +37,9 @@ class WebScraper {
 			protocol
 				.get(url, (response) => {
 					if (response.statusCode !== 200) {
-						reject(new Error(`Download failed: ${response.statusCode}`));
+						console.log(new Error(`Download failed: ${response.statusCode}`));
+						// 不報錯，回傳原始url
+						resolve(url);
 						return;
 					}
 					const filePath = path.join(this.outputPath.media, fileName);
@@ -52,7 +54,13 @@ class WebScraper {
 						resolve(`${this.mediaPathPrefix}/${relativePath}`);
 					});
 				})
-				.on("error", reject);
+				.on("error", (error) => {
+					console.log(error.message);
+					console.log(error.code);
+					console.log(error.stack);
+					// 不報錯，回傳原始url
+					resolve(url);
+				});
 		});
 	}
 
