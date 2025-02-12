@@ -132,3 +132,4 @@ dist
 # output
 output/*/**
 /url_dictionary.json
+/search_index.json
