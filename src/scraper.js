@@ -13,7 +13,7 @@ class WebScraper {
 			root: path.join(process.cwd(), "output"),
 			media: null, // 將在 scrapeElement 時設置
 		};
-		this.mediaPathPrefix = process.env.MEDIA_PATH || "/media";
+		this.mediaPathPrefix = process.env.MEDIA_PATH || "";
 	}
 
 	async initialize(fileName) {
@@ -166,7 +166,7 @@ class WebScraper {
 			let processedHTML = html;
 			for (const { url, fileName: mediaFileName } of mediaUrls) {
 				const newPath = await this.downloadMedia(url, mediaFileName);
-				processedHTML = processedHTML.replace(url, newPath);
+				processedHTML = processedHTML.replaceAll(url, newPath);
 			}
 
 			const styles = await this.getStyles(page, selector);

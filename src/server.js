@@ -8,7 +8,6 @@ const searchIndex = new SearchIndex();
 
 // 靜態文件服務
 app.use(express.static("output"));
-app.use("/media", express.static("output/media"));
 
 // API 端點
 app.get("/api/articles", async (req, res) => {
