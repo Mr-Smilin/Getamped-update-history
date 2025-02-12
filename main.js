@@ -1,6 +1,6 @@
 require("dotenv").config();
-const UrlManager = require("./url-manager");
-const WebScraper = require("./scraper");
+const UrlManager = require("./src/url-manager");
+const WebScraper = require("./src/scraper");
 
 async function main() {
 	try {
@@ -20,12 +20,13 @@ async function main() {
 		console.log(`發現 ${newUrls.length} 個新的 URL`);
 
 		// 依序處理每個 URL
-		for (const { url, date } of newUrls) {
+		for (const { url, date, title } of newUrls) {
 			console.log(`\n處理 URL: ${url}`);
+			console.log(`日期: ${date}, 標題: ${title}`);
 			const scraper = new WebScraper(url);
 
 			try {
-				await scraper.scrapeElement(className, date);
+				await scraper.scrapeElement(className, title, date);
 				console.log(`成功處理: ${url}`);
 			} catch (error) {
 				console.error(`處理 ${url} 時發生錯誤:`, error);

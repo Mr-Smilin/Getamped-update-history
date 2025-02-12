@@ -130,5 +130,5 @@ dist
 .pnp.*
 
 # output
-output/*
+output/*/**
 /url_dictionary.json

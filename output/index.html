@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>GA 更新資訊</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 20px;
+				background-color: #f5f5f5;
+			}
+			.controls {
+				background: white;
+				padding: 20px;
+				border-radius: 8px;
+				margin-bottom: 20px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+			.search-box {
+				box-sizing: border-box;
+				width: 100%;
+				padding: 10px;
+				margin-bottom: 10px;
+				border: 1px solid #ddd;
+				border-radius: 4px;
+			}
+			.per-page {
+				padding: 5px;
+				margin-left: 10px;
+			}
+			.articles {
+				background: white;
+				padding: 20px;
+				border-radius: 8px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+			}
+			.article {
+				padding: 15px;
+				border-bottom: 1px solid #eee;
+			}
+			.article:last-child {
+				border-bottom: none;
+			}
+			.article a {
+				color: #2c3e50;
+				text-decoration: none;
+				font-size: 1.1em;
+			}
+			.article a:hover {
+				color: #3498db;
+			}
+			.date {
+				color: #7f8c8d;
+				font-size: 0.9em;
+				margin-top: 5px;
+			}
+			.pagination {
+				margin-top: 20px;
+				text-align: center;
+			}
+			.pagination button {
+				padding: 5px 15px;
+				margin: 0 5px;
+				border: 1px solid #ddd;
+				background: white;
+				cursor: pointer;
+				border-radius: 4px;
+			}
+			.pagination button:disabled {
+				background: #f5f5f5;
+				cursor: not-allowed;
+			}
+			.pagination span {
+				margin: 0 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="controls">
+			<input
+				type="text"
+				id="search"
+				class="search-box"
+				placeholder="搜尋標題或內容 (可用空格分隔多個關鍵字)"
+			/>
+			<label>
+				每頁顯示：
+				<select id="perPage" class="per-page">
+					<option value="10">10</option>
+					<option value="20">20</option>
+					<option value="50">50</option>
+				</select>
+			</label>
+		</div>
+
+		<div class="articles" id="articleList"></div>
+
+		<div class="pagination">
+			<button id="prevPage" disabled>上一頁</button>
+			<span id="pageInfo">第 1 頁，共 1 頁</span>
+			<button id="nextPage" disabled>下一頁</button>
+		</div>
+
+		<script>
+			let currentPage = 1;
+			let perPage = 10;
+			let searchQuery = "";
+			let totalPages = 1;
+
+			async function fetchData() {
+				const params = new URLSearchParams({
+					page: currentPage,
+					perPage,
+					q: searchQuery,
+				});
+				const response = await fetch(`/api/articles?${params}`);
+				const data = await response.json();
+				return data;
+			}
+
+			function renderArticles(articles) {
+				const container = document.getElementById("articleList");
+				container.innerHTML = articles.data
+					.map(
+						(article) => `
+                <div class="article">
+                    <a href="${article.date}/${article.date}.html">${article.title}</a>
+                    <div class="date">${article.date}</div>
+                </div>
+            `
+					)
+					.join("");
+
+				document.getElementById("prevPage").disabled = currentPage <= 1;
+				document.getElementById("nextPage").disabled =
+					currentPage >= articles.totalPages;
+				document.getElementById(
+					"pageInfo"
+				).textContent = `第 ${currentPage} 頁，共 ${articles.totalPages} 頁`;
+			}
+
+			async function updateList() {
+				const data = await fetchData();
+				totalPages = data.totalPages;
+				renderArticles(data);
+			}
+
+			document.getElementById("search").addEventListener("input", async (e) => {
+				searchQuery = e.target.value;
+				currentPage = 1;
+				await updateList();
+			});
+
+			document
+				.getElementById("perPage")
+				.addEventListener("change", async (e) => {
+					perPage = parseInt(e.target.value);
+					currentPage = 1;
+					await updateList();
+				});
+
+			document
+				.getElementById("prevPage")
+				.addEventListener("click", async () => {
+					if (currentPage > 1) {
+						currentPage--;
+						await updateList();
+					}
+				});
+
+			document
+				.getElementById("nextPage")
+				.addEventListener("click", async () => {
+					if (currentPage < totalPages) {
+						currentPage++;
+						await updateList();
+					}
+				});
+
+			// 初始加載
+			updateList();
+		</script>
+	</body>
+</html>

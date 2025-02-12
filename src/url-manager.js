@@ -53,8 +53,9 @@ class UrlManager {
 
 		const jsonData = await this.fetchUrls(apiUrl);
 		const urlsWithInfo = jsonData.topics.map((topic) => ({
-			url: topic.url,
-			date: topic.date,
+			url: topic?.url,
+			date: topic?.date,
+			title: topic?.title,
 		}));
 
 		// 找出新的 URL
@@ -66,7 +67,7 @@ class UrlManager {
 		urlsWithInfo.forEach((item) => this.dictionary.add(item.url));
 		await this.saveDictionary();
 
-		return newUrls;
+		return newUrls.reverse();
 	}
 }
 

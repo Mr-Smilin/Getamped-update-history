@@ -1,4 +1,5 @@
 require("dotenv").config();
+const SearchIndex = require("./search-index");
 const puppeteer = require("puppeteer");
 const fs = require("fs").promises;
 const path = require("path");
@@ -144,7 +145,7 @@ class WebScraper {
 		}, selector);
 	}
 
-	async scrapeElement(selector, fileName = null) {
+	async scrapeElement(selector, fileName = null, date = null) {
 		const browser = await puppeteer.launch({
 			headless: "new",
 			args: ["--no-sandbox", "--disable-setuid-sandbox"],
@@ -157,7 +158,7 @@ class WebScraper {
 				timeout: 30000,
 			});
 
-			await this.initialize(fileName);
+			await this.initialize(date);
 
 			const { html, mediaUrls } = await this.getPageContent(page, selector);
 			if (!html) throw new Error(`元素未找到: ${selector}`);
@@ -180,11 +181,9 @@ class WebScraper {
 </html>`;
 
 			const outputFile = path.join(
-				fileName
-					? path.join(this.outputPath.root, fileName)
-					: this.outputPath.root,
+				date ? path.join(this.outputPath.root, date) : this.outputPath.root,
 				`${
-					fileName ||
+					date ||
 					`element_${selector.replace(/[^a-z0-9]/gi, "_")}_${Date.now()}`
 				}.html`
 			);
@@ -193,6 +192,27 @@ class WebScraper {
 			console.log(
 				`已保存至: ${outputFile}\n媒體文件位置: ${this.outputPath.media}`
 			);
+
+			// 更新搜索索引
+			try {
+				const searchIndex = new SearchIndex();
+				// 清理 HTML 標籤以獲得純文本內容
+				const cleanContent = processedHTML
+					.replace(/<[^>]*>/g, " ")
+					.replace(/\s+/g, " ")
+					.trim();
+
+				await searchIndex.addEntry({
+					date: date,
+					title: fileName,
+					content: cleanContent,
+					url: `${date}/${date}.html`,
+				});
+				console.log("搜索索引已更新");
+			} catch (indexError) {
+				console.error("更新搜索索引時發生錯誤:", indexError);
+				// 不要因為索引更新失敗而中斷整個流程
+			}
 		} catch (error) {
 			console.error("錯誤:", error);
 			throw error;
