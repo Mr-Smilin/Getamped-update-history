@@ -26,7 +26,11 @@ git clone https://github.com/Mr-Smilin/Getamped-update-history.git
 
 npm install
 
-npm start
+# 開始爬蟲
+npm run start
+
+# 到 http://localhost:3000 查看爬蟲結果
+npm run server
 
 ```
 
