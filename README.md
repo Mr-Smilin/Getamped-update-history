@@ -32,6 +32,9 @@ npm run start
 # 到 http://localhost:3000 查看爬蟲結果
 npm run server
 
+# 靜態檔案生成
+npm run build
+
 ```
 
 開始記錄爬蟲時間: 2025/02/12
