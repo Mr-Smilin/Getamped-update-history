@@ -5,7 +5,10 @@ const WebScraper = require("./src/scraper");
 async function main() {
 	try {
 		const apiUrl = process.env.API_URL || "https://your-api-url.com";
+		const useId = process.env.USE_ID || false;
+		const idName = process.env.ID_NAME || "contents_inner";
 		const className = process.env.CLASS_NAME || ".target-class-name";
+		const selector = useId ? "#" + idName : className;
 		const manager = new UrlManager();
 
 		// 獲取新的 URL
@@ -26,7 +29,7 @@ async function main() {
 			const scraper = new WebScraper(url);
 
 			try {
-				await scraper.scrapeElement(className, title, date);
+				await scraper.scrapeElement(selector, title, date);
 				console.log(`成功處理: ${url}`);
 			} catch (error) {
 				console.error(`處理 ${url} 時發生錯誤:`, error);

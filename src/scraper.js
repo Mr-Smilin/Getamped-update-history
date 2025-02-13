@@ -89,71 +89,71 @@ class WebScraper {
 		);
 	}
 
-	async getStyles(page, selector) {
-		await page.waitForFunction(() =>
-			Array.from(document.styleSheets).every(
-				(sheet) =>
-					!sheet.href || document.querySelector(`link[href="${sheet.href}"]`)
-			)
-		);
+	// async getStyles(page, selector) {
+	// 	await page.waitForFunction(() =>
+	// 		Array.from(document.styleSheets).every(
+	// 			(sheet) =>
+	// 				!sheet.href || document.querySelector(`link[href="${sheet.href}"]`)
+	// 		)
+	// 	);
 
-		return page.evaluate((selector) => {
-			const styles = new Set();
-			const element = document.querySelector(selector);
-			if (!element) return "";
+	// 	return page.evaluate((selector) => {
+	// 		const styles = new Set();
+	// 		const element = document.querySelector(selector);
+	// 		if (!element) return "";
 
-			// 處理樣式表規則
-			const processRule = (rule) => {
-				if (
-					rule instanceof CSSStyleRule &&
-					element.matches(rule.selectorText)
-				) {
-					styles.add(rule.cssText);
-				} else if (rule instanceof CSSMediaRule) {
-					const mediaRules = Array.from(rule.cssRules)
-						.filter(
-							(r) =>
-								r instanceof CSSStyleRule && element.matches(r.selectorText)
-						)
-						.map((r) => r.cssText)
-						.join("\n");
-					if (mediaRules) {
-						styles.add(`@media ${rule.conditionText} {\n${mediaRules}\n}`);
-					}
-				}
-			};
+	// 		// 處理樣式表規則
+	// 		const processRule = (rule) => {
+	// 			if (
+	// 				rule instanceof CSSStyleRule &&
+	// 				element.matches(rule.selectorText)
+	// 			) {
+	// 				styles.add(rule.cssText);
+	// 			} else if (rule instanceof CSSMediaRule) {
+	// 				const mediaRules = Array.from(rule.cssRules)
+	// 					.filter(
+	// 						(r) =>
+	// 							r instanceof CSSStyleRule && element.matches(r.selectorText)
+	// 					)
+	// 					.map((r) => r.cssText)
+	// 					.join("\n");
+	// 				if (mediaRules) {
+	// 					styles.add(`@media ${rule.conditionText} {\n${mediaRules}\n}`);
+	// 				}
+	// 			}
+	// 		};
 
-			// 收集所有樣式
-			for (const sheet of document.styleSheets) {
-				try {
-					Array.from(sheet.cssRules || []).forEach(processRule);
-				} catch (e) {
-					console.warn(`無法讀取樣式表: ${sheet.href || "inline"}`);
-				}
-			}
+	// 		// 收集所有樣式
+	// 		for (const sheet of document.styleSheets) {
+	// 			try {
+	// 				Array.from(sheet.cssRules || []).forEach(processRule);
+	// 			} catch (e) {
+	// 				console.warn(`無法讀取樣式表: ${sheet.href || "inline"}`);
+	// 			}
+	// 		}
 
-			// 處理內聯樣式
-			if (element.hasAttribute("style")) {
-				styles.add(`${selector} { ${element.getAttribute("style")} }`);
-			}
+	// 		// 處理內聯樣式
+	// 		if (element.hasAttribute("style")) {
+	// 			styles.add(`${selector} { ${element.getAttribute("style")} }`);
+	// 		}
 
-			// 處理計算後的樣式
-			const computed = window.getComputedStyle(element);
-			const computedRules = Array.from(computed)
-				.filter((prop) => {
-					const value = computed.getPropertyValue(prop);
-					return value && value !== "initial" && value !== "none";
-				})
-				.map((prop) => `  ${prop}: ${computed.getPropertyValue(prop)};`)
-				.join("\n");
+	// 		// 處理計算後的樣式
+	// 		const computed = window.getComputedStyle(element);
+	// 		const computedRules = Array.from(computed)
+	// 			.filter((prop) => {
+	// 				const value = computed.getPropertyValue(prop);
+	// 				return value && value !== "initial" && value !== "none";
+	// 			})
+	// 			.map((prop) => `  ${prop}: ${computed.getPropertyValue(prop)};`)
+	// 			.join("\n");
 
-			if (computedRules) {
-				styles.add(`${selector} {\n${computedRules}\n}`);
-			}
+	// 		if (computedRules) {
+	// 			styles.add(`${selector} {\n${computedRules}\n}`);
+	// 		}
 
-			return Array.from(styles).join("\n");
-		}, selector);
-	}
+	// 		return Array.from(styles).join("\n");
+	// 	}, selector);
+	// }
 
 	async scrapeElement(selector, fileName = null, date = null) {
 		const browser = await puppeteer.launch({
@@ -179,13 +179,17 @@ class WebScraper {
 				processedHTML = processedHTML.replaceAll(url, newPath);
 			}
 
-			const styles = await this.getStyles(page, selector);
+			// const styles = await this.getStyles(page, selector);
 			const outputHTML = `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <style>${styles}</style>
+    <!-- <style>${/* styles */ ""}</style> -->
+	<link rel="stylesheet" type="text/css" href="${this.mediaPathPrefix}/info.css">
+	<link rel="stylesheet" type="text/css" href="${
+		this.mediaPathPrefix
+	}/layout.css">
 </head>
 <body>${processedHTML}</body>
 </html>`;

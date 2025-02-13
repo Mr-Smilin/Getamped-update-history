@@ -131,6 +131,7 @@ dist
 
 # output
 output/*/**
+!output/images/**
 output_static/*
 /url_dictionary.json
 /search_index.json
