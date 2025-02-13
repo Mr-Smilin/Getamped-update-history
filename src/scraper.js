@@ -13,7 +13,9 @@ class WebScraper {
 			root: path.join(process.cwd(), "output"),
 			media: null, // 將在 scrapeElement 時設置
 		};
-		this.mediaPathPrefix = process.env.MEDIA_PATH || "";
+		this.mediaPathPrefix = !!process.env.MEDIA_PATH
+			? "/" + process.env.MEDIA_PATH
+			: "";
 	}
 
 	async initialize(fileName) {

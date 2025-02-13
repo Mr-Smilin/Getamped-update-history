@@ -1,8 +1,13 @@
+require("dotenv").config();
 const StaticGenerator = require("./src/static-generator");
 
 async function build() {
 	console.log("開始生成靜態網站...");
-	const generator = new StaticGenerator();
+	const generator = new StaticGenerator(
+		"./output",
+		"./output_static",
+		process.env.MEDIA_PATH || ""
+	);
 
 	try {
 		generator
