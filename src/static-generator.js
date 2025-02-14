@@ -10,7 +10,7 @@ class StaticGenerator {
 	) {
 		this.sourcePath = sourcePath; // 原始檔案位置
 		this.buildPath = buildPath; // 靜態網站輸出位置
-		this.media_path = media_path;
+		this.media_path = !!media_path ? "/" + media_path : "";
 		this.searchIndex = new SearchIndex();
 	}
 
@@ -104,7 +104,7 @@ class StaticGenerator {
 			.map(
 				(article) => `
             <div class="article">
-                <a href="/${this.media_path}/${article.date}/${article.date}.html">${article.title}</a>
+                <a href="${this.media_path}/${article.date}/${article.date}.html">${article.title}</a>
                 <div class="date">${article.date}</div>
             </div>
         `
@@ -117,7 +117,7 @@ class StaticGenerator {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GA 更新資訊</title>
-    <link rel="stylesheet" href="/${this.media_path}/styles.css">
+    <link rel="stylesheet" href="${this.media_path}/styles.css">
 </head>
 <body>
     <div class="controls">
@@ -147,13 +147,13 @@ class StaticGenerator {
         ${this.generatePaginationHtml(currentPage, totalPages, perPage)}
     </div>
 
-    <script src="/${this.media_path}/search.js"></script>
+    <script src="${this.media_path}/search.js"></script>
     <script>
         document.getElementById('perPage').addEventListener('change', (e) => {
             const perPage = e.target.value;
             window.location.href = perPage === '10' 
-                ? '/${this.media_path}' 
-                : '/${this.media_path}' + '/page/' + perPage + '/1';
+                ? '${this.media_path}' 
+                : '${this.media_path}' + '/page/' + perPage + '/1';
         });
     </script>
 </body>
@@ -162,7 +162,7 @@ class StaticGenerator {
 
 	generatePaginationHtml(currentPage, totalPages, perPage) {
 		// const basePath = perPage === 10 ? "" : `/page/${perPage}`;
-		const basePath = `/${this.media_path}/page/${perPage}`;
+		const basePath = `${this.media_path}/page/${perPage}`;
 		const prevPage =
 			currentPage > 1
 				? currentPage === 2 && perPage === 10
@@ -205,7 +205,7 @@ document.getElementById('search').addEventListener('input', (e) => {
     const container = document.getElementById('articleList');
     container.innerHTML = results.map(article => \`
         <div class="article">
-            <a href="/\${prefixPath}/\${article.date}/\${article.date}.html">\${article.title}</a>
+            <a href="${prefixPath}/\${article.date}/\${article.date}.html">\${article.title}</a>
             <div class="date">\${article.date}</div>
         </div>
     \`).join('');
