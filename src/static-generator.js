@@ -205,7 +205,7 @@ document.getElementById('search').addEventListener('input', (e) => {
     const container = document.getElementById('articleList');
     container.innerHTML = results.map(article => \`
         <div class="article">
-            <a href="${prefixPath}/\${article.date}/\${article.date}.html">\${article.title}</a>
+            <a href="\${prefixPath}/\${article.date}/\${article.date}.html">\${article.title}</a>
             <div class="date">\${article.date}</div>
         </div>
     \`).join('');
